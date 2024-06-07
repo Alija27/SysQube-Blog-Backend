@@ -60,7 +60,6 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-
         $data = $request->validate([
             "title" => "string",
             "slug" => "string|unique:posts,slug," . $post->id,
@@ -85,9 +84,8 @@ class PostController extends Controller
                 Storage::delete('public/' . $post->image);
             }
         }
-
         $post->update($data);
-        return response()->json(["message" => "Post updated successfully", "post" => new PostResource($post)]);
+        return response()->json(["message" => "Post updated successfully", "post" => new PostResource($post->refresh())]);
     }
 
     /**

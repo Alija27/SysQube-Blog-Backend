@@ -15,9 +15,9 @@ Route::post("/register" , [AuthController::class, "register"]);
 Route::post("/login", [AuthController::class, "login"])->middleware(CheckIfUserIsBlocked::class);
 Route::post("/logout",[AuthController::class,"logout"])->middleware('auth:sanctum');
 
+Route::get("admin/posts", [PostController::class, "indexAdmin"])->middleware('auth:sanctum');
 Route::resource("posts", PostController::class)->except(["index","show"])->middleware('auth:sanctum');
 Route::get("posts", [PostController::class, "index"]);
 Route::get("posts/{post}", [PostController::class, "show"]);
-Route::get("admin/posts", [PostController::class, "indexAdmin"])->middleware('auth:sanctum');
 
 Route::resource("users", UserController::class)->except(["store","show","update"]);
