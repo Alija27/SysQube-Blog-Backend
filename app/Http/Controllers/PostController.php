@@ -16,7 +16,13 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
+        $posts = Post::with('user')->where("status", "published")->get();
+        return response()->json(PostResource::collection($posts));
+    }
+
+    public function indexAdmin()
+    {
+        $posts = Post::with('user')->get();
         return response()->json(PostResource::collection($posts));
     }
 
@@ -26,6 +32,7 @@ class PostController extends Controller
     public function store(PostRequest $request)
     {
         $data = $request->validated();
+        
         if ($request->file('image')) {
             $request->validate(["image" => ['image', 'mimes:png,jpeg,gif']]);
             $ext = $request->file('image')->extension();
@@ -34,6 +41,8 @@ class PostController extends Controller
             $request->file('image')->storeAs('public/images', $path);
             $data['image'] = "images/" . $path;
         }
+        $data['user_id'] = auth()->user()->id;
+
         $post = Post::create($data);
         return response()->json(["message" => "Post created successfully", "post" => new PostResource($post)]);
     }
@@ -41,9 +50,9 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(PostResource $post)
+    public function show(Post $post)
     {
-        return response()->json($post);
+        return response()->json(new PostResource($post));
     }
 
     /**
@@ -53,12 +62,12 @@ class PostController extends Controller
     {
 
         $data = $request->validate([
-            "title" => "required|string",
-            "slug" => "required|string|unique:posts,slug," . $post->id,
-            "description" => "required|string",
-            "status" => "required|in:draft,published",
+            "title" => "string",
+            "slug" => "string|unique:posts,slug," . $post->id,
+            "description" => "string",
+            "status" => "in:draft,published",
             "image" => "nullable|image|mimes:jpeg,png,jpg,gif,svg",
-            "user_id" => "required|exists:users,id",
+            "user_id" => "exists:users,id",
         ]);
 
         if ($request->hasFile('image')) {
