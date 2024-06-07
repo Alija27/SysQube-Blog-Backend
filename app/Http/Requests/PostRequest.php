@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class PostRequest extends FormRequest
 {
@@ -25,9 +26,7 @@ class PostRequest extends FormRequest
             "title" => "required|string",
             "slug" => "required|string|unique:posts,slug",
             "description" => "required|string",
-            "status" => "required|in:draft,published",
             "image" => "nullable|image|mimes:jpeg,png,jpg,gif,svg",
-            "user_id" => "required|exists:users,id",
         ];
     }
 }
